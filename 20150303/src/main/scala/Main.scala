@@ -5,7 +5,13 @@ sealed trait Node {
   val value: Int
 }
 
-case class Branch(left: Node, value: Int, right: Node) extends Node
+class \^-^/[A]
+object \^-^/ {
+  implicit val ▂▅▇█▓▒░░▒▓█▇▅▂ = new \^-^/[Leaf]
+  implicit def █▓▒░░▒▓█[A <: Node] = new \^-^/[Branch[A]]
+}
+
+case class Branch[A <: Node](left: A, value: Int, right: A)(implicit ev: \^-^/[A]) extends Node
 case class Leaf(value: Int) extends Node
 
 case class BTree(node: Node) {
@@ -17,13 +23,13 @@ case class BTree(node: Node) {
 
     sizeIter(node)
   }
-  
+
   def max(): Int = {
     def maxIter(currentNode: Node): Int = currentNode match {
       case Leaf(v) => v
       case Branch(_, _, r) => maxIter(r)
     }
-    
+
     maxIter(node)
   }
 
@@ -35,7 +41,7 @@ case class BTree(node: Node) {
 
     minIter(node)
   }
-  
+
   def avg(): Double = {
     def avgIter(currentNode: Node, count: Int, result: Int): (Int, Int) = currentNode match {
       case Leaf(v) => (count + 1, result + v)
@@ -45,20 +51,20 @@ case class BTree(node: Node) {
         (leftCount + rightCount, leftResult + rightResult)
       }
     }
-    
+
     val (count, result) = avgIter(node, 0, 0)
     result.toDouble / count
   }
-  
+
   def sum(): Int = {
     def sumIter(currentNode: Node): Int = currentNode match {
       case Leaf(v) => v
       case Branch(l, v, r) => sumIter(l) + v + sumIter(r)
     }
-    
+
     sumIter(node)
   }
-  
+
   def find(n: Int): Option[Node] = {
     def findIter(currentNode: Node): Option[Node] =  {
       currentNode match {
@@ -69,7 +75,7 @@ case class BTree(node: Node) {
         }
       }
     }
-    
+
     findIter(node)
   }
 }

@@ -211,3 +211,20 @@ object P32 {
     gcdIter(smaller, greater)
   }
 }
+
+object P33 {
+  implicit class RichInt(n: Int) {
+    def isCoprimeTo(m: Int): Boolean = {
+      P32.gcd(n, m) == 1
+    }
+  }
+}
+
+object P34 {
+  implicit class EulerInt(n: Int) {
+    import P33._
+    def totient(): Int = {
+      (1 to n).count(_.isCoprimeTo(n))
+    }
+  }
+}

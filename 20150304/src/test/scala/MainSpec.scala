@@ -1,5 +1,5 @@
 import org.scalacheck.Properties
-import org.scalacheck.Prop.forAll
+import org.scalacheck.Prop.{forAll, BooleanOperators}
 
 /**
  * Created by hokada on 3/4/15.
@@ -50,5 +50,20 @@ object MainSpec extends Properties("99 problems") {
   property("pack") = forAll({ (lst: List[Int]) =>
     val l = P09.pack(lst)
     l.forall(innerList => innerList.forall(i => i == innerList.head))
+  })
+  
+  property("decode") = forAll({ (lst: List[Int]) =>
+    P12.decode(P10.encode(lst)) == lst
+  })
+  
+  property("encodeDirect") = forAll({ (lst: List[Int]) =>
+    P10.encode(lst) == P13.encodeDirect(lst)
+  })
+  
+  property("duplicateN") = forAll({(n: Int, lst: List[Int]) =>
+    (n > 0 && n < 100) ==> {
+      val dup =  P15.duplicateN(n, lst)
+      dup.size == lst.size * n
+    }
   })
 }

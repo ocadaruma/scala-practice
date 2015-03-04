@@ -85,13 +85,12 @@ object P08 {
 
 object P09 {
   def pack[A](lst: List[A]): List[List[A]] = {
-    val result = lst.foldLeft(List[List[A]]()) { (r, i) =>
-      r match {
-        case (innerLst @ (h::_))::tail if h == i => (i::innerLst)::tail
-        case _ => List(i)::r
+    lst.foldRight(List[List[A]]()) { (i, acc) =>
+      acc match {
+        case (innerLst@(h :: _)) :: tail if h == i => (i :: innerLst) :: tail
+        case _ => List(i) :: acc
       }
     }
-    P05.reverse(result)
   }
 }
 
@@ -112,4 +111,45 @@ object P11 {
     }
   }
 }
-    
+
+object P12 {
+  def decode[A](lst: List[(Int, A)]): List[A] = {
+    lst.foldRight(List[A]()){(t, acc) =>
+      val (n, e) = t
+      List.fill(n)(e):::acc
+    }
+  }
+}
+
+object P13 {
+  def encodeDirect[A](lst: List[A]): List[(Int, A)] = {
+    lst.foldRight(List[(Int, A)]()) { (i, acc) =>
+      acc match {
+        case (n, e) :: tail if e == i => (n + 1, e) :: tail
+        case _ => (1, i) :: acc
+      }
+    }
+  }
+}
+
+object P14 {
+  def duplicate[A](lst: List[A]): List[A] = {
+    P15.duplicateN(2, lst)
+  }
+}
+
+object P15 {
+  def duplicateN[A](n: Int, lst: List[A]): List[A] = {
+    @tailrec
+    def duplicateIter[A](m: Int, l: List[A], result: List[A]): List[A] = l match {
+      case Nil => result
+      case head::tail => m match {
+        case 0 => duplicateIter(n, tail, result)
+        case x if x > 0  => duplicateIter(m-1, l, head::result)
+        case _ => throw new IllegalArgumentException("n must greater than 0")
+      }
+    }
+
+    P05.reverse(duplicateIter(n, lst, Nil))
+  }
+}

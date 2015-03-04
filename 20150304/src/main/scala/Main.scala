@@ -49,7 +49,7 @@ object P05 {
     @tailrec
     def reverseIter[A](l: List[A], result: List[A]): List[A] = l match {
       case Nil => result
-      case head::tail => reverseIter(tail, head::result) 
+      case head::tail => reverseIter(tail, head::result)
     }
 
     reverseIter(lst, Nil)
@@ -62,24 +62,28 @@ object P06 {
   }
 }
 
-//object P07 {
-//  def flatten[A](lst: List[Any]): List[A] = {
-//    def flattenIter(l: List[Any], result: List[A]) = l match {
-//      case Nil => result
-//      case List(i) if i.isInstanceOf[A] =>
-//    }
-//  }
-//}
+object P07 {
+  def flatten(lst: List[Any]): List[Any] = {
+    def flattenIter(l: List[Any], result: List[Any]): List[Any] = l match {
+      case Nil => result
+      case head::tail => head match {
+        case ls@List(_*) => flattenIter(tail, flattenIter(ls, Nil):::result)
+        case _ => flattenIter(tail, head::result)
+      }
+    }
+
+    P05.reverse(flattenIter(lst, Nil))
+  }
+}
 
 object P08 {
   def compress[A](lst: List[A]): List[A] = {
-    val result = lst.foldLeft(List[A]()) { (r, i) =>
+    lst.foldRight(List[A]()) { (i, r) =>
       r match {
         case head::_ if head == i => r
         case _ => i :: r
       }
     }
-    P05.reverse(result)
   }
 }
 
@@ -170,17 +174,36 @@ object P16 {
   }
 }
 
-//object P17 {
-//  def split[A](i: Int, lst: List[A]): (List[A], List[A]) = {
-//    def splitIter[A](j: Int, l: List[A], result: List[A]) = {
-//      
-//    }
-//  }
-//}
+object P17 {
+  def split[A](i: Int, lst: List[A]): (List[A], List[A]) = {
+    @tailrec
+    def splitIter[A](j: Int, l: List[A], result: List[A]): (List[A], List[A]) = (j, l) match {
+      case (0, _) => (P05.reverse(result), l)
+      case (_, Nil) => (P05.reverse(result), l)
+      case (_, head::tail) => splitIter(j-1, tail, head::result)
+    }
 
-//object P18 {
-//
-//}
+    splitIter(i, lst, Nil)
+  }
+}
+
+object P18 {
+  def slice[A](from: Int, till: Int, lst: List[A]): List[A] = {
+    @tailrec
+    def sliceIter[A](index: Int, l: List[A], result: List[A]): List[A] = (index, l) match {
+      case (_, Nil) => P05.reverse(result)
+      case (i, _) if i >= till => P05.reverse(result)
+      case (i, head::tail) =>
+        if (from <= i && i < till) {
+          sliceIter(index + 1, tail, head::result)
+        } else {
+          sliceIter(index + 1, tail, result)
+        }
+    }
+
+    sliceIter(0, lst, Nil)
+  }
+}
 
 /* Arithmetic */
 

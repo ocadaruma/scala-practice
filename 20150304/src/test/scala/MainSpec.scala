@@ -39,4 +39,16 @@ object MainSpec extends Properties("99 problems") {
   property("isPalindrome") = forAll{ (lst: List[Int]) =>
     P06.isPalindrome(lst:::lst.reverse)
   }
+  
+  property("compress") = forAll{ (lst: List[Int]) =>
+    val l = P08.compress(lst)
+    (0 until lst.size).grouped(2).forall { g =>
+      if(g.size == 2) g(0) != g(1) else true
+    }
+  }
+  
+  property("pack") = forAll({ (lst: List[Int]) =>
+    val l = P09.pack(lst)
+    l.forall(innerList => innerList.forall(i => i == innerList.head))
+  })
 }

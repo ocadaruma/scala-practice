@@ -60,10 +60,8 @@ object MainSpec extends Properties("99 problems") {
     P10.encode(lst) == P13.encodeDirect(lst)
   })
   
-  property("duplicateN") = forAll({(n: Int, lst: List[Int]) =>
-    (n > 0 && n < 100) ==> {
-      val dup =  P15.duplicateN(n, lst)
-      dup.size == lst.size * n
-    }
+  property("duplicateN") = forAll({(lst: List[Int]) =>
+    val dup =  P15.duplicateN(5, lst)
+    dup.size == lst.size * 5
   })
 }

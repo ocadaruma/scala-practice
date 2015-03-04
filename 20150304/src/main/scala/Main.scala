@@ -39,7 +39,7 @@ object P04 {
       case Nil => len
       case _::tail => lengthIter(tail, len + 1)
     }
-    
+
     lengthIter(lst, 0)
   }
 }
@@ -51,7 +51,7 @@ object P05 {
       case Nil => result
       case head::tail => reverseIter(tail, head::result) 
     }
-    
+
     reverseIter(lst, Nil)
   }
 }
@@ -151,5 +151,63 @@ object P15 {
     }
 
     P05.reverse(duplicateIter(n, lst, Nil))
+  }
+}
+
+object P16 {
+  def drop[A](n: Int, lst: List[A]): List[A] = {
+    @tailrec
+    def dropIter[A](index: Int, l: List[A], result: List[A]): List[A] = l match {
+      case Nil => result
+      case head :: tail => if ((index + 1) % n == 0) {
+        dropIter(index + 1, tail, result)
+      } else {
+        dropIter(index + 1, tail, head :: result)
+      }
+    }
+
+    P05.reverse(dropIter(0, lst, Nil))
+  }
+}
+
+//object P17 {
+//  def split[A](i: Int, lst: List[A]): (List[A], List[A]) = {
+//    def splitIter[A](j: Int, l: List[A], result: List[A]) = {
+//      
+//    }
+//  }
+//}
+
+//object P18 {
+//
+//}
+
+/* Arithmetic */
+
+//▂▅▇█▓▒░(’ω’)░▒▓█▇▅▂うわあああああああ
+object P31 {
+  implicit class RichInt(n: Int) {
+    def isPrime(): Boolean = n match {
+      case _ if n <= 0 => throw new IllegalArgumentException
+      case 1 => false
+      case 2 => true
+      case _ => (2 until n).forall(n % _ != 0)
+    }
+  }
+}
+
+object P32 {
+  def gcd(m: Int, n: Int): Int = {
+    val (smaller, greater) = if (m < n) (m , n) else (n, m)
+
+    @tailrec
+    def gcdIter(s: Int, g: Int): Int = {
+      g % s match {
+        case 0 => s
+        case r => gcdIter(r, s)
+      }
+    }
+
+    gcdIter(smaller, greater)
   }
 }

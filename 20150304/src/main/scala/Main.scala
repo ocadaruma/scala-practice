@@ -205,6 +205,35 @@ object P18 {
   }
 }
 
+object P19 {
+  def rotate[A](i: Int, lst: List[A]): List[A] = {
+    if (lst.size > 0) {
+      val size = lst.size
+      val mod = if (i < 0) i % size + size else i % size
+
+      P18.slice(mod, mod + size, lst ::: lst)
+    } else {
+      Nil
+    }
+  }
+}
+
+object P20 {
+  def removeAt[A](i: Int, lst: List[A]): (List[A], Option[A]) = {
+    @tailrec
+    def removeAtIter[A](j: Int, l: List[A], result: List[A]): (List[A], Option[A]) = (j, l) match {
+      case (_, Nil) => (P05.reverse(result), None)
+      case (_, head::tail) => if (j == i){
+        (P05.reverse(result):::tail, Some(head))
+      } else {
+        removeAtIter(j + 1, tail, head::result)
+      }
+    }
+
+    removeAtIter(0, lst, Nil)
+  }
+}
+
 /* Arithmetic */
 
 //▂▅▇█▓▒░(’ω’)░▒▓█▇▅▂うわあああああああ

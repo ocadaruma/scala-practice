@@ -67,7 +67,7 @@ object P07 {
     def flattenIter(l: List[Any], result: List[Any]): List[Any] = l match {
       case Nil => result
       case head::tail => head match {
-        case ls@List(_*) => flattenIter(tail, flattenIter(ls, Nil):::result)
+        case ls: List[_] => flattenIter(tail, flattenIter(ls, Nil):::result)
         case _ => flattenIter(tail, head::result)
       }
     }

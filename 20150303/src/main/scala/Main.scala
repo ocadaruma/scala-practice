@@ -11,7 +11,7 @@ object \^-^/ {
   implicit def █▓▒░░▒▓█[A <: Node] = new \^-^/[Branch[A]]
 }
 
-case class Branch[A <: Node](left: A, value: Int, right: A)(implicit ev: \^-^/[A]) extends Node
+case class Branch[+A <: Node](left: A, value: Int, right: A)(implicit ev: \^-^/[A]) extends Node
 case class Leaf(value: Int) extends Node
 
 case class BTree(node: Node) {
@@ -20,6 +20,10 @@ case class BTree(node: Node) {
       case Leaf(v) => 1
       case Branch(l, _, r) => sizeIter(l) + sizeIter(r) + 1
     }
+
+    val lll = Branch(Leaf(1),2,Leaf(3))
+    val rrr= Branch(Branch(Leaf(5),6,Leaf(7)), 8, Branch(Leaf(9),10,Leaf(11)))
+    val bbb=Branch(lll, 4, rrr)
 
     sizeIter(node)
   }
@@ -70,12 +74,38 @@ case class BTree(node: Node) {
       currentNode match {
         case _ if currentNode.value == n => Some(currentNode)
         case Leaf(_) => None
-        case Branch(l, v, r) => {
-          if (n < v) findIter(l) else findIter(r)
-        }
+        case Branch(l, v, r) => findIter(if (v < n) l else r)
       }
     }
 
     findIter(node)
   }
 }
+
+object T {
+  val regex =
+    ("""\s*(""" +
+      """(//.*)|""" +
+      """([0-9]+)|""" +
+      """"(\\"|\\\\|\\n|[^"])*"|""" +
+      """([A_Z_a-z][A-Z_a-z0-9]*|==|<=|>=|&&|\|\||\p{Punct})""" +
+      """)?""").r
+
+  def qsort(xs: Seq[Int]): Seq[Int] = xs match {
+    case Nil | Seq(_) => xs
+    case pivot +: tail =>
+      val(smaller, greater) = tail.partition(_ <= pivot)
+      qsort(smaller) ++ Seq(pivot) ++ qsort(greater)
+  }
+
+  def m(str: String) = str match {
+    case regex(whole, comment, num, str, id) =>
+      println(whole)
+      println(comment)
+      println(num)
+      println(str)
+      println(id)
+    case _ => println("no match")
+  }
+}
+

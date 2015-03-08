@@ -1,5 +1,8 @@
+package com.mayreh.stone
+
 import java.io.{LineNumberReader, Reader}
 
+import scala.annotation.tailrec
 import scala.collection.mutable
 
 /**
@@ -11,7 +14,7 @@ object Lexer {
   private val stringRegex = """"(?:\\"|\\\\|\\n|[^"])*""""
   private val identifierRegex = """[A_Z_a-z][A-Z_a-z0-9]*|==|<=|>=|&&|\|\||\p{Punct}"""
 
-  val regex = s"""\s*(($commentRegex)|($numberRegex)|($stringRegex)|$identifierRegex)?""".r
+  val regex = s"""(\\s*(?:($commentRegex)|($numberRegex)|($stringRegex)|($identifierRegex))?)""".r
 
   def apply(reader: Reader): Lexer = {
     new Lexer(reader)
@@ -21,11 +24,21 @@ object Lexer {
 class Lexer(reader: Reader) {
   private val lineNumReader = new LineNumberReader(reader)
   private val queue = mutable.Queue[Token]()
+  private var hasMore = true
 
-//  def read(): Token = if (fillQueue(0)) queue.dequeue else EOFToken
+  def read(i: Int = 0): Token = if (fillQueue(i)) queue.dequeue else EOFToken
 
-//  private def fillQueue(i: Int): Boolean = {
-//  }
+  @tailrec
+  private def fillQueue(i: Int): Boolean = {
+    if (i < queue.size) {
+      true
+    } else if (!hasMore) {
+      false
+    } else {
+      readLine
+      fillQueue(i)
+    }
+  }
 
   private def readLine(): Unit = {
     import Lexer.regex
@@ -34,18 +47,12 @@ class Lexer(reader: Reader) {
     if (line != null) {
       val lineNum = lineNumReader.getLineNumber
 
-      def readIter(startPos: Int): Unit = {
-        if (startPos < line.length) {
-        }
-      }
-      line match {
-        case regex(whole,_*) if whole == null => None
-        case regex(_,comment,_*) if comment != null => None
-        case regex(whole,_,num,_*) if num != null => Some(NumberToken(lineNum, whole))
-        case regex(whole,_,_,str,_*) if str != null => Some(StringToken(lineNum, whole))
-        case regex(whole,_*) if whole != null => Some(IdentifierToken(lineNum, whole))
-        case _ => None
-      }
-    }
+      queue ++= regex.findAllMatchIn(line).collect({
+        case <>(None, _*) => throw new ParseException(s"syntax error at line:$lineNum")
+        case <>(_, None, Some(num), _*) => NumberToken(lineNum, num)
+        case <>(_, None, _, Some(str), _*) => StringToken(lineNum, str)
+        case <>(_, None, _, _, Some(id), _*) => IdentifierToken(lineNum, id)
+      })
+    } else { hasMore = false }
   }
 }
